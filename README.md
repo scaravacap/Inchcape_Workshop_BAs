@@ -108,10 +108,11 @@ Este agente lo vas a usar dos veces. Acá, para investigar vos. Y en el Paso 5,
 después de haber construido la vista de alertas, para dejárselo abierto al resto
 de la PMO.
 
-Los cinco pasos de arriba también se pueden pedir por API desde un notebook, con
-el prompt de
-[PROMPTS.md, sección 1](PROMPTS.md#crearlo-con-genie-code). El resultado es el
-mismo agente; hacelo así el día que necesites crearlo en varios workspaces.
+Esos cinco pasos también se los podés pedir a Genie Code en una frase, sin tocar
+el menú. El prompt está en
+[PROMPTS.md, sección 1](PROMPTS.md#crearlo-con-genie-code) y el resultado es el
+mismo agente. Hacelo a mano al menos una vez: en el Paso 5 vas a volver a esta
+pantalla a agregarle la vista de alertas.
 
 **Preguntas para pegar**, en este orden. Cada una se apoya en la anterior.
 

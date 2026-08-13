@@ -62,50 +62,32 @@ no vio nunca estos datos.
 
 ### Crearlo con Genie Code
 
-En el [README](README.md) el agente se crea a mano, con cuatro clics, y ese es
-el camino del taller. Este prompt hace lo mismo desde un notebook, contra la API
-de Databricks. Te sirve el día que tengas que crear el mismo agente en varios
-workspaces, o dejarlo versionado junto con el resto del proyecto.
+En el [README](README.md) el agente se crea a mano, desde el menú de Genie. Este
+es el mismo agente pedido en una frase. Crear un Genie Agent es una de las cosas
+que Genie Code sabe hacer solo, así que alcanza con decirle qué querés adentro.
 
 ```
-Creá un Genie Agent para el equipo de posventa de Inchcape y devolveme el link
-para abrirlo. Hacelo con Python en este notebook, contra la API de Databricks.
-
-Entorno. El endpoint es POST /api/2.0/genie/spaces y recibe cuatro campos:
-warehouse_id, title, description y serialized_space. El último es un string
-JSON con esta forma:
-
-    {
-      "version": 2,
-      "data_sources": {"tables": [{"identifier": "catalogo.esquema.tabla"}]},
-      "instructions": {"text_instructions": [{"id": "...", "content": ["..."]}]},
-      "config": {"sample_questions": [{"id": "...", "question": ["..."]}]}
-    }
-
-Dos reglas de ese formato: la lista de tablas va ordenada alfabéticamente por
-identifier, y cada id es un UUID de 32 caracteres hexadecimales en minúscula y
-sin guiones, como el que devuelve uuid.uuid4().hex.
-
-El warehouse es el serverless que ya existe en el workspace. Buscá su id con el
-SDK, no lo escribas a mano.
-
-Contenido del agente:
-- Título: Posventa Inchcape Andina.
-- Tablas: todas las de inchcape_workshop.ops y todas las de
-  inchcape_workshop.pmo. Listalas del catálogo en vez de escribirlas de
-  memoria, así no se te queda ninguna afuera.
-- Instrucciones: el bloque 1 del archivo SKILLS.md de este repositorio, tal
-  cual y sin resumirlo. Está en la carpeta de Git que clonaste en el Paso 0.
-- Preguntas sugeridas, estas dos:
-  ¿Cómo evolucionó la venta de repuestos mes a mes en los últimos doce meses?
-  ¿Qué proyectos del portafolio están en riesgo hoy y por qué?
-
-Al terminar, imprimí la URL del agente.
+Creá un Genie Agent llamado Posventa Inchcape Andina con las tablas de los
+esquemas ops y pmo del catálogo inchcape_workshop.
 ```
 
-Abrí el link y comprobá tres cosas: que están las tablas de los dos esquemas,
-que el texto de instrucciones quedó cargado y que las dos preguntas aparecen en
-la pantalla de inicio. De ahí en adelante es idéntico al que se crea a mano.
+Genie Code busca las tablas, arma el agente y te lo propone como un **asset**
+para revisar. Antes de darle **Accept**, mirá la lista: sé explícito con los
+esquemas que querés, porque si le pedís "las tablas relevantes" suele incluir
+también el esquema `raw`, que son los extractos crudos de SAP y en este recorrido
+no los usamos.
+
+Las instrucciones se las podés pedir en el mismo chat, una vez que el agente
+existe:
+
+```
+Al Genie Agent Posventa Inchcape Andina agregale como instrucciones el bloque 1
+del archivo SKILLS.md de este repositorio, tal cual y sin resumirlo.
+```
+
+Si preferís verlo, abrí el agente y pegá ese bloque a mano en **Instrucciones**,
+que es el último punto de la lista del Paso 1 en el README. El resultado es el
+mismo.
 
 ### Las preguntas de exploración
 
