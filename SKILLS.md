@@ -94,7 +94,7 @@ Tablas de pmo: pmo_projects, pmo_milestones, pmo_budget
 
 ## 3. Instrucciones del asistente de PMO
 
-Este bloque se agrega al Genie Agent en el Paso 5, encima del bloque 1. Lo
+Este bloque se agrega al Genie Agent al final del Paso 2, encima del bloque 1. Lo
 convierte de una herramienta de análisis a un asistente de estatus.
 
 ```text

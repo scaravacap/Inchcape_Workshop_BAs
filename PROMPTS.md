@@ -6,15 +6,13 @@ paso a paso del taller; acá está el texto para copiar de cada paso.
 | Paso del README | Sección de este archivo |
 |---|---|
 | Paso 1. Crea tu Genie Agent y pregúntale a tus datos | 1, de principio a *Cuando Genie se equivoca* |
-| Paso 2. El cruce que hoy hacés a mano en Excel | 2 |
+| Paso 2. El cruce que hoy hacés a mano en Excel | 2, y el cierre en 1, *Abrirlo al resto de la PMO* |
 | Paso 3. El dashboard de portafolio y posventa | 3 |
 | Paso 4. La app interna | 4 |
-| Paso 5. Abrí tu Genie Agent al resto de la PMO | 1, última parte |
 
-Los pasos 1 y 5 caen los dos en la sección 1 porque trabajan sobre el mismo
-Genie Agent: en el 1 lo creás y explorás vos, en el 5 lo dejás listo para los
-demás. Tener las dos mitades juntas te evita saltar de un lado al otro del
-archivo cuando querés ver qué le pusiste.
+El Paso 2 termina volviendo al Genie Agent, así que su última parte cae en la
+sección 1. Todo lo del agente vive junto ahí, y así no tenés que saltar de un
+lado al otro del archivo para ver qué le pusiste.
 
 Dos reglas antes de empezar, que valen para todos:
 
@@ -55,10 +53,10 @@ Un Genie Agent responde preguntas de negocio en español sobre las tablas que vo
 le des. Esta sección lo cubre entero: crearlo, explorar con él y dejarlo abierto
 para el resto de la PMO.
 
-Lo que cambia entre el Paso 1 y el Paso 5 es quién pregunta. En el 1 preguntás
-vos, explorando, y cada pregunta se apoya en la respuesta de la anterior. En el
-5 dejás ese mismo agente listo para que pregunte el resto de la PMO, gente que
-no vio nunca estos datos.
+Lo que cambia de una parte a la otra es quién pregunta. Al principio preguntás
+vos, explorando, y cada pregunta se apoya en la respuesta de la anterior. Al
+final del Paso 2 dejás ese mismo agente listo para que pregunte el resto de la
+PMO, gente que no vio nunca estos datos.
 
 ### Crearlo con Genie Code
 
@@ -140,11 +138,10 @@ de dim_dealer y agrupá por ahí.
 
 ### Abrirlo al resto de la PMO
 
-Esta parte es el Paso 5 del README, y va después del Paso 2 porque necesita la
-vista `vw_alertas_portafolio` que construís ahí. No creás un agente nuevo: al
-mismo de arriba le agregás la vista, le pegás el bloque 3 de
-[SKILLS.md](SKILLS.md) encima del bloque 1, y guardás estas cinco preguntas como
-sugeridas.
+Esto cierra el Paso 2 del README, porque necesita la vista
+`vw_alertas_portafolio` que construís ahí. No creás un agente nuevo: al mismo de
+arriba le agregás la vista, le pegás el bloque 3 de [SKILLS.md](SKILLS.md) encima
+del bloque 1, y guardás estas cinco preguntas como sugeridas.
 
 Ahí está el salto del recorrido. Recién creado, el que preguntaba eras vos y
 tenías que saber qué preguntar. Con las cinco preguntas en pantalla, cualquiera

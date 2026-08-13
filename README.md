@@ -99,9 +99,9 @@ nombre `Posventa Inchcape Andina`.
 vocabulario de Inchcape, y es la diferencia entre respuestas buenas y respuestas
 raras.
 
-Este agente lo vas a usar dos veces. Acá, para investigar vos. Y en el Paso 5,
-después de haber construido la vista de alertas, para dejárselo abierto al resto
-de la PMO.
+Este agente lo vas a usar dos veces. Acá, para investigar vos. Y al final del
+Paso 2, cuando ya tengas la vista de alertas, para dejárselo abierto al resto de
+la PMO.
 
 **Preguntas para pegar**, en este orden. Cada una se apoya en la anterior.
 
@@ -200,6 +200,14 @@ Agrégale comentarios a la vista y a cada columna explicando qué es, para que
 cualquiera en la PMO la entienda sin preguntarme.
 ```
 
+Con la vista lista, volvé un momento al Genie Agent del Paso 1: agregale
+`vw_alertas_portafolio` como fuente y pegá el **bloque 3** de
+[SKILLS.md](SKILLS.md) encima del bloque 1, sin borrar el 1. El bloque 1 le
+enseñó el vocabulario; el 3 le enseña a responderle a alguien que entra a una
+reunión en cinco minutos. Guardá también las cinco preguntas sugeridas de
+[PROMPTS.md, sección 1](PROMPTS.md#abrirlo-al-resto-de-la-pmo): con eso cualquiera
+en la PMO abre el agente y pregunta sin saber qué tablas hay.
+
 ## Paso 3. El dashboard de portafolio y posventa
 
 **Objetivo:** un tablero que sirva para la reunión de seguimiento, construido sin
@@ -296,39 +304,7 @@ empieza a publicarlos.
 log entero y pegáselo a Genie Code tal cual, con la instrucción `Corregí esto`.
 Es la forma más rápida de resolverlo, y es exactamente lo que haría yo.
 
-## Paso 5. Abrí tu Genie Agent al resto de la PMO
-
-**Objetivo:** que las preguntas repetidas de estatus se respondan solas, sin vos
-en el medio.
-
-**Qué hacer:** no creás nada nuevo. Volvés al mismo Genie Agent del Paso 1 y lo
-convertís de herramienta personal de análisis en asistente de la PMO. En el
-Paso 1 el que preguntaba eras vos y sabías qué preguntar; acá lo dejás listo para
-alguien que no sabe ni qué tablas hay.
-
-1. Agrega la vista `vw_alertas_portafolio` al agente. No existía cuando lo
-   creaste: la construiste vos en el Paso 2, y es la que le permite responder
-   sobre alertas del portafolio.
-2. En **Instrucciones**, pega el **bloque 3** de [SKILLS.md](SKILLS.md), encima
-   del bloque 1 que ya está. No borres el bloque 1: el 1 le enseña el negocio, el
-   3 le enseña el oficio de responderle a alguien que entra a una reunión en
-   cinco minutos.
-3. Guarda como preguntas sugeridas las cinco de
-   [PROMPTS.md, sección 1, *Abrirlo al resto de la PMO*](PROMPTS.md#abrirlo-al-resto-de-la-pmo).
-   Son las que aparecen en pantalla al abrir el agente, así nadie tiene que saber
-   qué preguntar.
-4. Comparte el agente con un compañero y pedile que pregunte algo que vos no
-   hayas probado.
-
-Este paso vive en la sección 1 de PROMPTS.md, junto con el Paso 1, porque los dos
-trabajan sobre el mismo agente.
-
-**Cómo sabés que funcionó:** alguien que nunca vio estos datos hace una pregunta
-de estatus en español y recibe una respuesta correcta, con la tabla que la
-respalda. Ese es el paso en que dejás de ser el intermediario entre la PMO y los
-datos.
-
-## Paso 6. Qué te llevás
+## Paso 5. Qué te llevás
 
 Cinco minutos, sin pantalla. Responde para vos:
 
