@@ -88,18 +88,18 @@ en el Paso 4, la creamos ahora y se va cocinando sola mientras trabajás.
 
 Mientras se crea, seguí con el Paso 1.
 
-## Paso 1. Preguntarle a los datos en español
+## Paso 1. Crea tu Genie Agent y pregúntale a tus datos
 
 **Objetivo:** responder preguntas de negocio sin escribir SQL, y descubrir el
 incidente por tu cuenta.
 
-**Qué hacer:** crea un espacio de Genie sobre los datos.
+**Qué hacer:** crea un Genie Agent sobre los datos.
 
 1. Menú de la izquierda, **Genie**.
 2. **New**, y elige el catálogo `inchcape_workshop`.
 3. Agrega los esquemas `ops` y `pmo` completos.
-4. Guarda el espacio con el nombre `Posventa Inchcape Andina`.
-5. En la configuración del espacio, pega el **bloque 1** de
+4. Guarda el agente con el nombre `Posventa Inchcape Andina`.
+5. En la configuración del agente, pega el **bloque 1** de
    [SKILLS.md](SKILLS.md) en **Instrucciones**. Ese texto le enseña el
    vocabulario de Inchcape, y es la diferencia entre respuestas buenas y
    respuestas raras.
@@ -107,6 +107,11 @@ incidente por tu cuenta.
 Este agente lo vas a usar dos veces. Acá, para investigar vos. Y en el Paso 5,
 después de haber construido la vista de alertas, para dejárselo abierto al resto
 de la PMO.
+
+Los cinco pasos de arriba también se pueden pedir por API desde un notebook, con
+el prompt de
+[PROMPTS.md, sección 1](PROMPTS.md#crearlo-con-genie-code). El resultado es el
+mismo agente; hacelo así el día que necesites crearlo en varios workspaces.
 
 **Preguntas para pegar**, en este orden. Cada una se apoya en la anterior.
 
@@ -148,6 +153,11 @@ podés decir en una frase cuánta plata costó y en qué puntos se concentró.
 **Si una respuesta sale mal**, no la aceptes. Escribile qué está mal, igual que le
 dirías a un analista. Por ejemplo: `El monto está inflado porque estás contando las
 líneas anuladas. Excluí las que tienen monto negativo y volvé a calcular.`
+
+**Si te sobra tiempo**, en
+[PROMPTS.md, sección 1](PROMPTS.md#1-crea-tu-genie-agent-y-pregúntale-a-tus-datos)
+hay una séptima pregunta, sobre qué familias de repuesto sufrieron más durante
+el incidente, y más ejemplos de cómo corregir a Genie sin empezar de cero.
 
 ## Paso 2. El cruce que hoy hacés a mano en Excel
 
@@ -211,11 +221,9 @@ español lo que querés ver.
 
 [PROMPTS.md, sección 3](PROMPTS.md#3-el-dashboard) trae los dos caminos: el
 **corto**, un prompt que pide el tablero completo, y el **paso a paso**, seis
-prompts, uno por gráfico. El corto es el más rápido cuando funciona, y también el
-que más se rompe: seis visualizaciones en una sola pasada es mucho pedirle al
-asistente, y si te devuelve `Unable to render visualization` no vas a saber cuál
-de las seis lo causó. Ahí pedís esa sola con su prompt del paso a paso. Los seis
-gráficos son:
+prompts, uno por gráfico. Empezá por el corto. Si una visualización no queda como
+esperabas, pedila sola con su prompt del paso a paso, que es más rápido que
+rehacer el tablero entero. Los seis gráficos son:
 
 1. Venta de repuestos por mes, con Nippon Parts separado del resto.
 2. Porcentaje de quiebre de stock por mes.
@@ -285,13 +293,13 @@ empieza a publicarlos.
 log entero y pegáselo a Genie Code tal cual, con la instrucción `Corregí esto`.
 Es la forma más rápida de resolverlo, y es exactamente lo que haría yo.
 
-## Paso 5. El asistente de estatus
+## Paso 5. Abrí tu Genie Agent al resto de la PMO
 
 **Objetivo:** que las preguntas repetidas de estatus se respondan solas, sin vos
 en el medio.
 
-**Qué hacer:** no creás nada nuevo. Volvés al mismo agente de Genie del Paso 1 y
-lo convertís de herramienta personal de análisis en asistente de la PMO. En el
+**Qué hacer:** no creás nada nuevo. Volvés al mismo Genie Agent del Paso 1 y lo
+convertís de herramienta personal de análisis en asistente de la PMO. En el
 Paso 1 el que preguntaba eras vos y sabías qué preguntar; acá lo dejás listo para
 alguien que no sabe ni qué tablas hay.
 
@@ -303,11 +311,14 @@ alguien que no sabe ni qué tablas hay.
    3 le enseña el oficio de responderle a alguien que entra a una reunión en
    cinco minutos.
 3. Guarda como preguntas sugeridas las cinco de
-   [PROMPTS.md, sección 5](PROMPTS.md#5-el-asistente-de-estatus). Son las que
-   aparecen en pantalla al abrir el agente, así nadie tiene que saber qué
-   preguntar.
+   [PROMPTS.md, sección 1, *Abrirlo al resto de la PMO*](PROMPTS.md#abrirlo-al-resto-de-la-pmo).
+   Son las que aparecen en pantalla al abrir el agente, así nadie tiene que saber
+   qué preguntar.
 4. Comparte el agente con un compañero y pedile que pregunte algo que vos no
    hayas probado.
+
+Este paso vive en la sección 1 de PROMPTS.md, junto con el Paso 1, porque los dos
+trabajan sobre el mismo agente.
 
 **Cómo sabés que funcionó:** alguien que nunca vio estos datos hace una pregunta
 de estatus en español y recibe una respuesta correcta, con la tabla que la
@@ -340,9 +351,10 @@ Esa tercera respuesta es la que quiero escuchar en el cierre de la tarde.
 ## Mapa del repositorio
 
 - [HISTORIA.md](HISTORIA.md), el caso de negocio y el modelo de datos. Leelo primero.
-- [PROMPTS.md](PROMPTS.md), todos los prompts de los seis pasos, listos para copiar.
-- [SKILLS.md](SKILLS.md), las instrucciones que le tenés que dar a Genie y a Genie
-  Code para que trabajen con el vocabulario de Inchcape.
+- [PROMPTS.md](PROMPTS.md), todos los prompts listos para copiar, en cuatro
+  secciones. Arranca con la tabla que dice qué sección le toca a cada paso.
+- [SKILLS.md](SKILLS.md), las instrucciones que le tenés que dar al Genie Agent y
+  a Genie Code para que trabajen con el vocabulario de Inchcape.
 - [notebooks/00_setup_datos.sql](notebooks/00_setup_datos.sql), el generador de datos.
 
 ---

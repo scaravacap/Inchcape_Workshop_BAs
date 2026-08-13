@@ -7,9 +7,9 @@ adivina y una que sirve.
 
 Este archivo tiene tres bloques para copiar y pegar.
 
-## 1. Instrucciones del espacio de Genie
+## 1. Instrucciones del Genie Agent
 
-Van en la configuración del espacio de Genie, sección **Instructions**. Este es el
+Van en la configuración del Genie Agent, sección **Instructions**. Este es el
 bloque que hace que las respuestas del Paso 1 salgan bien.
 
 ```text
@@ -63,7 +63,7 @@ repuestos.
 
 ## 2. Instrucciones de workspace para Genie Code
 
-Estas van en la configuración del workspace, no del espacio de Genie, y aplican a
+Estas van en la configuración del workspace, no la del Genie Agent, y aplican a
 todo el código que Genie Code escriba para vos. En el menú de configuración del
 workspace, buscá la sección de instrucciones del asistente.
 
@@ -94,7 +94,7 @@ Tablas de pmo: pmo_projects, pmo_milestones, pmo_budget
 
 ## 3. Instrucciones del asistente de PMO
 
-Este bloque se agrega al espacio de Genie en el Paso 5, encima del bloque 1. Lo
+Este bloque se agrega al Genie Agent en el Paso 5, encima del bloque 1. Lo
 convierte de una herramienta de análisis a un asistente de estatus.
 
 ```text
