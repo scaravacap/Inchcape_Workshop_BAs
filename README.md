@@ -254,11 +254,9 @@ GRANT USE SCHEMA ON SCHEMA inchcape_workshop.pmo TO `<service principal de tu ap
 GRANT SELECT ON SCHEMA inchcape_workshop.pmo TO `<service principal de tu app>`;
 ```
 
-   Son tres líneas y las tres hacen falta. `USE CATALOG` y `USE SCHEMA` la dejan
-   entrar; `SELECT` la deja leer. Corré las tres y verificá con
-   `SHOW GRANTS ON SCHEMA inchcape_workshop.pmo` que las tres quedaron: si el
-   service principal aparece con `USE_SCHEMA` pero sin `SELECT`, la app abre y
-   toda consulta falla con permiso denegado.
+   Las tres hacen falta: `USE CATALOG` y `USE SCHEMA` la dejan entrar, `SELECT`
+   la deja leer. Comprobá con `SHOW GRANTS ON SCHEMA inchcape_workshop.pmo` que
+   las tres quedaron aplicadas antes de seguir.
 
 2. Abrí el código de la app y reemplazalo con lo que te genere Genie Code a partir
    de [PROMPTS.md, sección 4](PROMPTS.md#4-la-app-interna). También acá hay dos
@@ -268,26 +266,19 @@ GRANT SELECT ON SCHEMA inchcape_workshop.pmo TO `<service principal de tu app>`;
    de pedirle más te ahorra depurar dos problemas a la vez.
 3. Dale **Deploy** y esperá. El primer despliegue tarda unos minutos.
 
-**Copiá el prompt entero, con los bloques de puerto, conexión y esquema.** Se ven
-como relleno técnico y son lo único que separa una app que abre de una que no.
-Los tres salieron de correr el prompt sin ellos: el modelo inventa un puerto
-8080, inventa tres variables de entorno que no existen, e inventa los nombres de
-las columnas de tu vista. La tabla al final de la sección 4 de
-[PROMPTS.md](PROMPTS.md#4-la-app-interna) explica cómo se ve cada falla.
+**Copiá el prompt entero, con el bloque de Entorno incluido.** Ahí van las
+convenciones de Databricks Apps: cómo se despliega, con qué identidad corre la
+app y de dónde sale el warehouse. Es el contexto que vos tenés y el asistente
+no, y es lo que hace que la app abra a la primera. Guardalo: la próxima app que
+pidas reusa ese mismo bloque tal cual.
 
 **Cómo sabés que funcionó:** abrís la URL de la app y ves las tres tarjetas con
 los números del Paso 2. Ese es el momento en que la PMO deja de pedir reportes y
 empieza a publicarlos.
 
-**Si la URL dice App Not Available**, no busques un error en el log, porque no
-hay: el despliegue dice `App started successfully` y el estado queda en
-`RUNNING`. Buscá la línea `Starting app with command:`. Si ahí aparece
-`--server.port=8080`, ese es todo el problema, y en la sección 4 de PROMPTS.md
-está el prompt exacto para corregirlo.
-
-**Si la app no arranca por cualquier otra razón**, copia el error del log y
-pegáselo a Genie Code tal cual, con la instrucción `Corregí esto`. Es la forma
-más rápida de resolverlo, y es exactamente lo que haría yo.
+**Si algo no sale a la primera**, andá a la pestaña **Logs** de la app, copiá el
+log entero y pegáselo a Genie Code tal cual, con la instrucción `Corregí esto`.
+Es la forma más rápida de resolverlo, y es exactamente lo que haría yo.
 
 ## Paso 5. El asistente de estatus
 
