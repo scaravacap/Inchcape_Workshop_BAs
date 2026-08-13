@@ -81,7 +81,9 @@ en el Paso 4, la creamos ahora y se va cocinando sola mientras trabajás.
 3. Plantilla: **Streamlit**.
 4. En la sección de **Resources** o recursos de la app, agregá el
    **SQL warehouse** llamado `Serverless Starter Warehouse` con permiso de uso.
-   Este paso es el que la gente olvida, y sin él la app no puede leer datos.
+   Dejá la clave del recurso en `sql-warehouse`, que es la que viene por defecto:
+   el `app.yaml` la va a referenciar con ese nombre exacto. Este paso es el que la
+   gente olvida, y sin él la app no tiene con qué consultar.
 5. Dale crear y **dejala ahí**. Volvemos en el Paso 4.
 
 Mientras se crea, seguí con el Paso 1.
@@ -248,10 +250,15 @@ veinticuatro horas. Se prenden de nuevo con un botón.
 
 ```sql
 GRANT USE CATALOG ON CATALOG inchcape_workshop TO `<service principal de tu app>`;
-GRANT USE SCHEMA, SELECT ON SCHEMA inchcape_workshop.pmo TO `<service principal de tu app>`;
+GRANT USE SCHEMA ON SCHEMA inchcape_workshop.pmo TO `<service principal de tu app>`;
+GRANT SELECT ON SCHEMA inchcape_workshop.pmo TO `<service principal de tu app>`;
 ```
 
-   Si te salta la app sin permisos y no entendés por qué, es casi siempre esto.
+   Son tres líneas y las tres hacen falta. `USE CATALOG` y `USE SCHEMA` la dejan
+   entrar; `SELECT` la deja leer. Corré las tres y verificá con
+   `SHOW GRANTS ON SCHEMA inchcape_workshop.pmo` que las tres quedaron: si el
+   service principal aparece con `USE_SCHEMA` pero sin `SELECT`, la app abre y
+   toda consulta falla con permiso denegado.
 
 2. Abrí el código de la app y reemplazalo con lo que te genere Genie Code a partir
    de [PROMPTS.md, sección 4](PROMPTS.md#4-la-app-interna). También acá hay dos
@@ -261,30 +268,26 @@ GRANT USE SCHEMA, SELECT ON SCHEMA inchcape_workshop.pmo TO `<service principal 
    de pedirle más te ahorra depurar dos problemas a la vez.
 3. Dale **Deploy** y esperá. El primer despliegue tarda unos minutos.
 
-El prompt de la app mínima arranca así:
-
-```
-Escribime una app de Streamlit para Databricks Apps que le sirva a la PMO de
-Inchcape para revisar el portafolio antes del comité. Requisitos:
-
-- Lee de la vista inchcape_workshop.pmo.vw_alertas_portafolio usando
-  databricks-sql-connector con las credenciales que Databricks Apps inyecta
-  por variables de entorno. No hardcodees ningún token.
-- Arriba, tres tarjetas grandes: cantidad de proyectos duplicados,
-  cantidad sin fecha comprometida, y dólares de sobregiro total.
-- Abajo, una tabla filtrable por tipo de alerta y por país.
-- Un botón que exporte la tabla filtrada a CSV.
-- Todo el texto de la interfaz en español.
-- Incluí el archivo app.yaml y el requirements.txt que necesita.
-```
+**Copiá el prompt entero, con los bloques de puerto, conexión y esquema.** Se ven
+como relleno técnico y son lo único que separa una app que abre de una que no.
+Los tres salieron de correr el prompt sin ellos: el modelo inventa un puerto
+8080, inventa tres variables de entorno que no existen, e inventa los nombres de
+las columnas de tu vista. La tabla al final de la sección 4 de
+[PROMPTS.md](PROMPTS.md#4-la-app-interna) explica cómo se ve cada falla.
 
 **Cómo sabés que funcionó:** abrís la URL de la app y ves las tres tarjetas con
 los números del Paso 2. Ese es el momento en que la PMO deja de pedir reportes y
 empieza a publicarlos.
 
-**Si la app no arranca**, copia el error del log y pegáselo a Genie Code tal cual,
-con la instrucción `Corregí esto`. Es la forma más rápida de resolverlo, y es
-exactamente lo que haría yo.
+**Si la URL dice App Not Available**, no busques un error en el log, porque no
+hay: el despliegue dice `App started successfully` y el estado queda en
+`RUNNING`. Buscá la línea `Starting app with command:`. Si ahí aparece
+`--server.port=8080`, ese es todo el problema, y en la sección 4 de PROMPTS.md
+está el prompt exacto para corregirlo.
+
+**Si la app no arranca por cualquier otra razón**, copia el error del log y
+pegáselo a Genie Code tal cual, con la instrucción `Corregí esto`. Es la forma
+más rápida de resolverlo, y es exactamente lo que haría yo.
 
 ## Paso 5. El asistente de estatus
 

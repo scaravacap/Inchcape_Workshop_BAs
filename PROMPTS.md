@@ -356,30 +356,64 @@ sobre esas tres columnas.
 
 ### Camino corto: un prompt, la app completa
 
-Las dos pestañas y el cache, todo en el mismo pedido.
+Las dos pestañas y el cache, todo en el mismo pedido. Los tres primeros bloques
+parecen burocracia y no lo son: son las tres cosas que el modelo inventa cuando
+no se las decís. Están explicadas debajo del prompt.
 
 ```
 Escribime una app de Streamlit para Databricks Apps que le sirva a la PMO de
 Inchcape para revisar el portafolio antes del comité. Dame todos los archivos
 que necesita para desplegar: app.py, app.yaml y requirements.txt.
 
-Conexión a datos:
-- Leé con databricks-sql-connector, usando las credenciales que Databricks Apps
-  inyecta por variables de entorno. No hardcodees ningún token, host ni
-  warehouse id.
-- Envolvé cada lectura en una función cacheada con st.cache_data y un tiempo de
-  vida de diez minutos. Todo el filtrado se hace en memoria sobre el DataFrame
-  ya cargado, no volviendo a consultar. Si la app consulta cada vez que muevo un
-  filtro, se vuelve inusable.
+Puerto. En app.yaml el comando es exactamente
+command: ["streamlit", "run", "app.py"], sin --server.port y sin
+--server.address. Databricks Apps le asigna el puerto por la variable
+DATABRICKS_APP_PORT y Streamlit lo toma solo.
 
-Pestaña 1, Alertas del portafolio. Lee de
+Conexión. Usá exactamente este patrón, que es el que funciona dentro de
+Databricks Apps:
+
+    import os
+    from databricks.sdk.core import Config
+    from databricks import sql
+
+    cfg = Config()
+    conn = sql.connect(
+        server_hostname=cfg.host,
+        http_path=f"/sql/1.0/warehouses/{os.environ['DATABRICKS_WAREHOUSE_ID']}",
+        credentials_provider=lambda: cfg.authenticate,
+    )
+
+No inventes variables de entorno: DATABRICKS_SERVER_HOSTNAME,
+DATABRICKS_HTTP_PATH y DATABRICKS_TOKEN no existen acá y llegan en None. En
+app.yaml declará el warehouse como recurso, nunca con el id escrito a mano:
+
+    env:
+      - name: DATABRICKS_WAREHOUSE_ID
+        valueFrom: sql-warehouse
+
+Esquema. Antes de escribir el código, consultá el esquema real de
+inchcape_workshop.pmo.vw_alertas_portafolio y los valores distintos de su
+columna de tipo de alerta, y construí la app contra lo que encuentres. Esa
+vista la creé yo con Genie y no sé de memoria cómo quedaron los nombres. No
+asumas que la columna de monto se llama monto_usd ni que las etiquetas de
+alerta son las que vos supondrías.
+
+Cache. Envolvé cada lectura en una función con st.cache_data y un tiempo de
+vida de diez minutos. Todo el filtrado se hace en memoria sobre el DataFrame ya
+cargado, no volviendo a consultar. Si la app consulta cada vez que muevo un
+filtro, se vuelve inusable.
+
+Pestaña 1, Alertas del portafolio, desde
 inchcape_workshop.pmo.vw_alertas_portafolio:
 - Arriba, tres tarjetas grandes: cantidad de proyectos duplicados, cantidad sin
-  fecha comprometida, y dólares de sobregiro total.
-- Abajo, una tabla filtrable por tipo de alerta y por país.
+  fecha de cierre comprometida, y dólares de sobregiro total. Las tres salen de
+  filtrar por tipo de alerta, con los valores reales que encontraste en la vista.
+- Abajo, una tabla con filtros por tipo de alerta y por país. Si la vista no
+  tiene columna de país, dejá solo el de tipo de alerta y decímelo.
 - Un botón que exporte a CSV la tabla ya filtrada, no la tabla completa.
 
-Pestaña 2, Seguimiento presupuestal. Lee de inchcape_workshop.pmo.pmo_budget,
+Pestaña 2, Seguimiento presupuestal, desde inchcape_workshop.pmo.pmo_budget,
 columnas mes, presupuesto_mes_usd y ejecutado_mes_usd:
 - Un gráfico de barras agrupadas con presupuesto contra ejecutado, mes a mes.
 - Debajo, la tabla mensual con desviación en dólares, desviación acumulada del
@@ -389,27 +423,68 @@ columnas mes, presupuesto_mes_usd y ejecutado_mes_usd:
 Detalles que aplican a las dos pestañas:
 - Todo el texto de la interfaz en español.
 - Montos en dólares, con separador de miles y sin decimales.
-- Si una consulta falla, mostrá un mensaje claro en la interfaz en vez de
+- Si una consulta falla, mostrá el mensaje de error en la interfaz en vez de
   reventar con el stack trace.
 ```
 
+**Por qué están esos tres bloques.** Los tres salieron de correr este mismo
+prompt sin ellos. Cada uno rompe la app de una forma distinta, y ninguna de las
+tres es obvia mirando la pantalla.
+
+| Lo que el modelo inventa | Cómo se ve la falla |
+|---|---|
+| `--server.port=8080` en `app.yaml` | La URL responde **App Not Available**. Y lo peor: los logs dicen `App started successfully` y el estado queda en `RUNNING`, así que todo parece bien. El proxy de Apps golpea el puerto 8000 y Streamlit está escuchando en el 8080. |
+| `DATABRICKS_SERVER_HOSTNAME`, `DATABRICKS_HTTP_PATH`, `DATABRICKS_TOKEN` | No existen en Apps, llegan en `None` y la conexión falla. Lo que Apps sí inyecta es `DATABRICKS_CLIENT_ID` y `DATABRICKS_CLIENT_SECRET`, que es justo lo que `Config()` lee solo. |
+| Nombres de columna y etiquetas de la vista | La app abre, no tira ningún error, y las tres tarjetas muestran cero. Es la más cara de encontrar de las tres. |
+
+Hay un cuarto problema que ningún prompt puede resolver, porque no es código: la
+app corre con su propia identidad y esa identidad nace sin acceso a los datos.
+Eso se arregla con los `GRANT` del [Paso 4 del README](README.md#paso-4-la-app-interna).
+
 ### Camino paso a paso
 
-Primero la app mínima que despliega y se ve:
+Los bloques de puerto, conexión y esquema van igual: no son un lujo del camino
+corto, son lo que hace que la app abra. Primero la app mínima que despliega y
+se ve:
 
 ```
 Escribime una app de Streamlit para Databricks Apps que le sirva a la PMO de
-Inchcape para revisar el portafolio antes del comité. Requisitos:
+Inchcape para revisar el portafolio antes del comité. Dame app.py, app.yaml y
+requirements.txt.
 
-- Lee de la vista inchcape_workshop.pmo.vw_alertas_portafolio usando
-  databricks-sql-connector con las credenciales que Databricks Apps inyecta
-  por variables de entorno. No hardcodees ningún token.
-- Arriba, tres tarjetas grandes: cantidad de proyectos duplicados,
-  cantidad sin fecha comprometida, y dólares de sobregiro total.
-- Abajo, una tabla filtrable por tipo de alerta y por país.
-- Un botón que exporte la tabla filtrada a CSV.
+Puerto. En app.yaml el comando es exactamente
+command: ["streamlit", "run", "app.py"], sin --server.port y sin
+--server.address. Databricks Apps asigna el puerto por DATABRICKS_APP_PORT.
+
+Conexión. Usá exactamente este patrón:
+
+    import os
+    from databricks.sdk.core import Config
+    from databricks import sql
+
+    cfg = Config()
+    conn = sql.connect(
+        server_hostname=cfg.host,
+        http_path=f"/sql/1.0/warehouses/{os.environ['DATABRICKS_WAREHOUSE_ID']}",
+        credentials_provider=lambda: cfg.authenticate,
+    )
+
+y en app.yaml declará el warehouse como recurso:
+
+    env:
+      - name: DATABRICKS_WAREHOUSE_ID
+        valueFrom: sql-warehouse
+
+Esquema. Antes de escribir el código, consultá el esquema real de
+inchcape_workshop.pmo.vw_alertas_portafolio y los valores distintos de su
+columna de tipo de alerta, y construí la app contra eso. No asumas nombres.
+
+Contenido:
+- Arriba, tres tarjetas grandes: cantidad de proyectos duplicados, cantidad sin
+  fecha de cierre comprometida, y dólares de sobregiro total.
+- Abajo, una tabla con filtros por tipo de alerta y por país.
+- Un botón que exporte a CSV la tabla ya filtrada.
 - Todo el texto de la interfaz en español.
-- Incluí el archivo app.yaml y el requirements.txt que necesita.
 ```
 
 Desplegala y comprobá que abre antes de pedirle nada más. Recién ahí, la
@@ -440,6 +515,29 @@ La app falló al desplegar. Este es el log completo:
 [pega acá el log tal cual, sin resumirlo]
 
 Corregí el problema y explicame en una línea qué estaba mal.
+```
+
+**Si la URL dice App Not Available**, ese prompt no te va a servir, porque no
+hay ningún error en el log: el despliegue salió bien y la app está corriendo.
+Buscá en el log la línea `Starting app with command:`. Si dice `--server.port=8080`,
+ese es el problema completo.
+
+```
+La app despliega bien y el log dice App started successfully, pero la URL
+responde App Not Available. En el log veo que arranca con
+--server.port=8080. Corregí app.yaml para que el comando sea exactamente
+["streamlit", "run", "app.py"], sin flags de puerto ni de address, para que
+Streamlit tome el puerto que le asigna Databricks Apps.
+```
+
+**Si la app abre pero las tarjetas muestran cero**, no es la conexión: es que
+los nombres no coinciden.
+
+```
+La app abre pero las tres tarjetas muestran cero y la tabla sí trae filas.
+Consultá los valores distintos de la columna de tipo de alerta en
+inchcape_workshop.pmo.vw_alertas_portafolio y el nombre real de la columna de
+monto, y corregí los filtros de las tarjetas para que usen esos valores.
 ```
 
 ## 5. El asistente de estatus
