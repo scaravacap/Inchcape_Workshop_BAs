@@ -62,9 +62,8 @@ no vio nunca estos datos.
 
 ### Crearlo con Genie Code
 
-En el [README](README.md) el agente se crea a mano, desde el menú de Genie. Este
-es el mismo agente pedido en una frase. Crear un Genie Agent es una de las cosas
-que Genie Code sabe hacer solo, así que alcanza con decirle qué querés adentro.
+Crear un Genie Agent es una de las cosas que Genie Code sabe hacer solo, así que
+alcanza con decirle qué querés adentro.
 
 ```
 Creá un Genie Agent llamado Posventa Inchcape Andina con las tablas de los
@@ -79,7 +78,8 @@ no los usamos.
 
 Falta una cosa, y es la que más se nota en las respuestas: abrí el agente y pegá
 el bloque 1 de [SKILLS.md](SKILLS.md) en **Instrucciones**. Ahí está el
-vocabulario de Inchcape, y es lo que separa una respuesta buena de una rara.
+vocabulario de Inchcape, y es lo que separa una respuesta buena de una rara. Eso
+va igual si creaste el agente a mano desde el menú de Genie.
 
 ### Las preguntas de exploración
 

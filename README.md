@@ -71,48 +71,37 @@ la sala, y por lo tanto los mismos resultados.
 **Ahora lee [HISTORIA.md](HISTORIA.md).** Son tres minutos y es lo que le da
 sentido a todo lo que sigue. Sin eso, los ejercicios son consultas sueltas.
 
-## Paso 0.5. Dispará la app ahora, aunque la vayas a usar al final
-
-Crear una app tarda unos tres minutos en aprovisionar. En vez de esperar sentado
-en el Paso 4, la creamos ahora y se va cocinando sola mientras trabajás.
-
-1. Menú **Compute**, pestaña **Apps**, botón **Create app**.
-2. Nombre: `alertas-portafolio-pmo`.
-3. Plantilla: **Streamlit**.
-4. En la sección de **Resources** o recursos de la app, agregá el
-   **SQL warehouse** llamado `Serverless Starter Warehouse` con permiso de uso.
-   Dejá la clave del recurso en `sql-warehouse`, que es la que viene por defecto:
-   el `app.yaml` la va a referenciar con ese nombre exacto. Este paso es el que la
-   gente olvida, y sin él la app no tiene con qué consultar.
-5. Dale crear y **dejala ahí**. Volvemos en el Paso 4.
-
-Mientras se crea, seguí con el Paso 1.
-
 ## Paso 1. Crea tu Genie Agent y pregúntale a tus datos
 
 **Objetivo:** responder preguntas de negocio sin escribir SQL, y descubrir el
 incidente por tu cuenta.
 
-**Qué hacer:** crea un Genie Agent sobre los datos.
+**Qué hacer:** crea un Genie Agent sobre los datos. Hay dos formas y el resultado
+es el mismo.
 
-1. Menú de la izquierda, **Genie**.
-2. **New**, y elige el catálogo `inchcape_workshop`.
-3. Agrega los esquemas `ops` y `pmo` completos.
-4. Guarda el agente con el nombre `Posventa Inchcape Andina`.
-5. En la configuración del agente, pega el **bloque 1** de
-   [SKILLS.md](SKILLS.md) en **Instrucciones**. Ese texto le enseña el
-   vocabulario de Inchcape, y es la diferencia entre respuestas buenas y
-   respuestas raras.
+**Pedíselo a Genie Code.** Crear un Genie Agent es una de las cosas que sabe
+hacer solo, así que alcanza con una frase:
+
+```
+Creá un Genie Agent llamado Posventa Inchcape Andina con las tablas de los
+esquemas ops y pmo del catálogo inchcape_workshop.
+```
+
+Te lo propone como un **asset** para revisar. Mirá la lista de tablas antes de
+darle **Accept**.
+
+**O crealo a mano**, desde el menú **Genie**: **New**, catálogo
+`inchcape_workshop`, agregá los esquemas `ops` y `pmo` completos, y guardá con el
+nombre `Posventa Inchcape Andina`.
+
+**Con cualquiera de las dos, falta un paso**: abrí el agente y pegá el **bloque
+1** de [SKILLS.md](SKILLS.md) en **Instrucciones**. Ese texto le enseña el
+vocabulario de Inchcape, y es la diferencia entre respuestas buenas y respuestas
+raras.
 
 Este agente lo vas a usar dos veces. Acá, para investigar vos. Y en el Paso 5,
 después de haber construido la vista de alertas, para dejárselo abierto al resto
 de la PMO.
-
-Esos cinco pasos también se los podés pedir a Genie Code en una frase, sin tocar
-el menú. El prompt está en
-[PROMPTS.md, sección 1](PROMPTS.md#crearlo-con-genie-code) y el resultado es el
-mismo agente. Hacelo a mano al menos una vez: en el Paso 5 vas a volver a esta
-pantalla a agregarle la vista de alertas.
 
 **Preguntas para pegar**, en este orden. Cada una se apoya en la anterior.
 
@@ -249,15 +238,33 @@ y fíjate cómo cambia la conclusión cuando aislás Colombia.
 **Objetivo:** pasar de entregar un reporte a entregar una herramienta. Esto es lo
 que cambia el rol de la PMO.
 
-Este es el paso más ambicioso del recorrido. La app que creaste en el Paso 0.5 ya
-debería estar lista.
+Este es el paso más ambicioso del recorrido. Son dos cosas distintas: el
+**contenedor** de la app, que creás una vez desde el menú y es donde se define
+con qué warehouse habla, y el **código**, que te lo escribe Genie Code.
 
 Free Edition permite hasta tres apps por cuenta, y las apaga solas a las
 veinticuatro horas. Se prenden de nuevo con un botón.
 
 **Qué hacer:**
 
-1. **Dale permiso a la app sobre los datos.** La app corre con su propia identidad,
+1. **Creá la app.** Menú **Compute**, pestaña **Apps**, botón **Create app**.
+   Nombre `alertas-portafolio-pmo`, plantilla **Streamlit**. En la sección de
+   **Resources**, agregá el SQL warehouse `Serverless Starter Warehouse` con
+   permiso de uso, y dejá la clave del recurso en `sql-warehouse`, que es la que
+   viene por defecto: el `app.yaml` la va a referenciar con ese nombre exacto.
+   Sin ese recurso la app no tiene con qué consultar.
+
+   Aprovisionar tarda unos tres minutos. No esperes mirando: seguí con el
+   punto 2 mientras se crea.
+
+2. **Pedile el código a Genie Code** con
+   [PROMPTS.md, sección 4](PROMPTS.md#4-la-app-interna). También acá hay dos
+   caminos: el **corto**, un prompt que pide la app entera con las dos pestañas y
+   el cache, o el **paso a paso**, que arranca con la versión mínima y le agrega
+   lo demás encima. Con una app, desplegar la versión mínima y verla abrir antes
+   de pedirle más te ahorra depurar dos problemas a la vez.
+
+3. **Dale permiso a la app sobre los datos.** La app corre con su propia identidad,
    un service principal, que nace sin acceso a nada. En la pantalla de tu app,
    copiá el nombre del service principal. Después, en un notebook, corré esto
    reemplazando el nombre:
@@ -272,13 +279,8 @@ GRANT SELECT ON SCHEMA inchcape_workshop.pmo TO `<service principal de tu app>`;
    la deja leer. Comprobá con `SHOW GRANTS ON SCHEMA inchcape_workshop.pmo` que
    las tres quedaron aplicadas antes de seguir.
 
-2. Abrí el código de la app y reemplazalo con lo que te genere Genie Code a partir
-   de [PROMPTS.md, sección 4](PROMPTS.md#4-la-app-interna). También acá hay dos
-   caminos: el **corto**, un prompt que pide la app entera con las dos pestañas y
-   el cache, o el **paso a paso**, que arranca con la versión mínima y le agrega
-   lo demás encima. Con una app, desplegar la versión mínima y verla abrir antes
-   de pedirle más te ahorra depurar dos problemas a la vez.
-3. Dale **Deploy** y esperá. El primer despliegue tarda unos minutos.
+4. **Pegá los tres archivos** en el código de la app, dale **Deploy** y esperá.
+   El primer despliegue tarda unos minutos.
 
 **Copiá el prompt entero, con el bloque de Entorno incluido.** Ahí van las
 convenciones de Databricks Apps: cómo se despliega, con qué identidad corre la
