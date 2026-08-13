@@ -77,17 +77,9 @@ esquemas que querés, porque si le pedís "las tablas relevantes" suele incluir
 también el esquema `raw`, que son los extractos crudos de SAP y en este recorrido
 no los usamos.
 
-Las instrucciones se las podés pedir en el mismo chat, una vez que el agente
-existe:
-
-```
-Al Genie Agent Posventa Inchcape Andina agregale como instrucciones el bloque 1
-del archivo SKILLS.md de este repositorio, tal cual y sin resumirlo.
-```
-
-Si preferís verlo, abrí el agente y pegá ese bloque a mano en **Instrucciones**,
-que es el último punto de la lista del Paso 1 en el README. El resultado es el
-mismo.
+Falta una cosa, y es la que más se nota en las respuestas: abrí el agente y pegá
+el bloque 1 de [SKILLS.md](SKILLS.md) en **Instrucciones**. Ahí está el
+vocabulario de Inchcape, y es lo que separa una respuesta buena de una rara.
 
 ### Las preguntas de exploración
 
