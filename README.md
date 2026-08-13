@@ -99,9 +99,14 @@ incidente por tu cuenta.
 2. **New**, y elige el catálogo `inchcape_workshop`.
 3. Agrega los esquemas `ops` y `pmo` completos.
 4. Guarda el espacio con el nombre `Posventa Inchcape Andina`.
-5. En la configuración del espacio, pega el bloque de **Instrucciones** que está
-   en [SKILLS.md](SKILLS.md). Ese texto le enseña a Genie el vocabulario de
-   Inchcape, y es la diferencia entre respuestas buenas y respuestas raras.
+5. En la configuración del espacio, pega el **bloque 1** de
+   [SKILLS.md](SKILLS.md) en **Instrucciones**. Ese texto le enseña el
+   vocabulario de Inchcape, y es la diferencia entre respuestas buenas y
+   respuestas raras.
+
+Este agente lo vas a usar dos veces. Acá, para investigar vos. Y en el Paso 5,
+después de haber construido la vista de alertas, para dejárselo abierto al resto
+de la PMO.
 
 **Preguntas para pegar**, en este orden. Cada una se apoya en la anterior.
 
@@ -282,22 +287,32 @@ Es la forma más rápida de resolverlo, y es exactamente lo que haría yo.
 
 ## Paso 5. El asistente de estatus
 
-**Objetivo:** que las preguntas repetidas de estatus se respondan solas.
+**Objetivo:** que las preguntas repetidas de estatus se respondan solas, sin vos
+en el medio.
 
-**Qué hacer:** volvé al espacio de Genie del Paso 1 y trabajá su configuración
-para que sirva como asistente de la PMO.
+**Qué hacer:** no creás nada nuevo. Volvés al mismo agente de Genie del Paso 1 y
+lo convertís de herramienta personal de análisis en asistente de la PMO. En el
+Paso 1 el que preguntaba eras vos y sabías qué preguntar; acá lo dejás listo para
+alguien que no sabe ni qué tablas hay.
 
-1. Agrega la vista `vw_alertas_portafolio` al espacio.
-2. En **Instrucciones**, pega el bloque de asistente de PMO de
-   [SKILLS.md](SKILLS.md).
+1. Agrega la vista `vw_alertas_portafolio` al agente. No existía cuando lo
+   creaste: la construiste vos en el Paso 2, y es la que le permite responder
+   sobre alertas del portafolio.
+2. En **Instrucciones**, pega el **bloque 3** de [SKILLS.md](SKILLS.md), encima
+   del bloque 1 que ya está. No borres el bloque 1: el 1 le enseña el negocio, el
+   3 le enseña el oficio de responderle a alguien que entra a una reunión en
+   cinco minutos.
 3. Guarda como preguntas sugeridas las cinco de
-   [PROMPTS.md, sección 5](PROMPTS.md#5-el-asistente-de-estatus).
-4. Comparte el espacio con un compañero y pedile que pregunte algo que vos no
+   [PROMPTS.md, sección 5](PROMPTS.md#5-el-asistente-de-estatus). Son las que
+   aparecen en pantalla al abrir el agente, así nadie tiene que saber qué
+   preguntar.
+4. Comparte el agente con un compañero y pedile que pregunte algo que vos no
    hayas probado.
 
 **Cómo sabés que funcionó:** alguien que nunca vio estos datos hace una pregunta
 de estatus en español y recibe una respuesta correcta, con la tabla que la
-respalda.
+respalda. Ese es el paso en que dejás de ser el intermediario entre la PMO y los
+datos.
 
 ## Paso 6. Qué te llevás
 
@@ -316,7 +331,7 @@ Esa tercera respuesta es la que quiero escuchar en el cierre de la tarde.
 |---|---|
 | `Table or view not found` | El notebook del Paso 0 no terminó. Corré `Run all` de nuevo y esperá la celda de validación. |
 | El warehouse aparece detenido | Prende solo con la primera consulta. La primera tarda entre veinte y cuarenta segundos, las siguientes son inmediatas. |
-| Genie responde con columnas que no existen | Le falta contexto. Pegá el bloque de Instrucciones de [SKILLS.md](SKILLS.md) en la configuración del espacio. |
+| Genie responde con columnas que no existen | Le falta contexto. Pegá el bloque 1 de [SKILLS.md](SKILLS.md) en las Instrucciones del agente. |
 | Un número no coincide con esta guía | Corré de nuevo el notebook del Paso 0. Los datos son deterministas, así que si difieren es que el setup quedó a medias. |
 | `Quota exceeded` o el cómputo no arranca | Se agotó la cuota diaria de la cuenta. Cierra pestañas con consultas corriendo. Si ya se agotó, se restablece al día siguiente. |
 | La app queda en `Stopped` | Free Edition apaga las apps a las veinticuatro horas. Entra a **Compute**, **Apps**, y dale **Start**. |

@@ -33,12 +33,17 @@ sobre un prompt de una visualización sí. Aislar es más rápido que adivinar. 
 caminos llegan al mismo lado, así que podés cambiar de uno al otro a mitad de
 camino: pedí con el corto lo que ya funcionó y con el paso a paso lo que no.
 
-Las secciones 1 y 5 no tienen esa división: son preguntas a Genie, no
-construcción. Cada pregunta se responde sola y se encadena con la anterior.
+Las secciones 1 y 5 no tienen esa división, y las dos trabajan sobre el mismo
+Genie Agent. Lo que cambia entre una y otra es quién pregunta. En la 1 preguntás
+vos, explorando, y cada pregunta se apoya en la respuesta de la anterior. En la
+5 dejás ese mismo agente listo para que pregunte el resto de la PMO, gente que
+no vio nunca estos datos.
 
 ## 1. Preguntarle a los datos en español
 
-Para el espacio de Genie del Paso 1. Van en orden, cada una construye sobre la anterior.
+Para el Genie Agent que creás en el Paso 1. Acá el analista sos vos: van en
+orden y cada una se apoya en lo que respondió la anterior, hasta llegar sola al
+incidente.
 
 ```
 ¿Cómo evolucionó la venta de repuestos mes a mes en los últimos doce meses?
@@ -517,8 +522,14 @@ usando cada tarjeta, y ajustalos.
 
 ## 5. El asistente de estatus
 
-Estas cinco se guardan como preguntas sugeridas del espacio de Genie, para que
-cualquiera en la PMO las use sin saber nada de datos.
+Es el mismo Genie Agent del Paso 1, con tres cosas encima que en el Paso 1
+todavía no existían: la vista `vw_alertas_portafolio` que creaste en el Paso 2,
+el bloque 3 de instrucciones de [SKILLS.md](SKILLS.md), que le da el rol de
+asistente de estatus, y estas cinco preguntas guardadas como sugeridas.
+
+Ahí está el salto del recorrido. En el Paso 1 preguntabas vos y tenías que saber
+qué preguntar. Acá cualquiera en la PMO abre el agente, ve las cinco preguntas
+en pantalla y obtiene la respuesta sin escribir nada ni saber nada de datos.
 
 ```
 ¿Qué proyectos del portafolio están en riesgo hoy y por qué?
