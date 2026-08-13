@@ -113,9 +113,10 @@ Consolidar en una vista reutilizable:
 ```
 Convierte las tres consultas en una sola vista llamada
 inchcape_workshop.pmo.vw_alertas_portafolio, con una columna tipo_alerta que
-diga cuál de los tres problemas es, una columna impacto_usd y una columna
-detalle. Agrégale comentarios a la vista y a cada columna explicando qué es,
-para que cualquiera en la PMO la entienda sin preguntarme.
+diga cuál de los tres problemas es, una columna impacto_usd, una columna detalle
+y las columnas proyecto_id, nombre, lider y pais del proyecto involucrado.
+Agrégale comentarios a la vista y a cada columna explicando qué es, para que
+cualquiera en la PMO la entienda sin preguntarme.
 ```
 
 El cruce entre los dos mundos, portafolio y operación. Esta es la pregunta que
@@ -132,85 +133,119 @@ avance promedio reportado. Quiero ver si estamos invirtiendo donde más duele.
 
 ## 3. El dashboard
 
-Uno por gráfico. Pegá cada uno en el asistente del dashboard.
+Un solo prompt para el tablero completo. Pegalo en el asistente del dashboard.
 
 ```
-Un gráfico de líneas con la venta mensual de repuestos en dólares de los
-últimos doce meses. Dos líneas: una con el proveedor Nippon Parts y otra con
-todos los demás proveedores juntos. Título: Venta de repuestos, Nippon Parts
-contra el resto.
+Armame un dashboard completo para el comité de seguimiento de posventa de
+Inchcape Andina. Lee del catálogo inchcape_workshop, esquemas ops y pmo.
+
+El tablero cuenta una historia en dos mitades: arriba qué pasó en la operación,
+abajo cómo va el portafolio de proyectos que se abrió para arreglarlo.
+
+Necesito seis visualizaciones, en este orden:
+
+1. Líneas. Suma de monto_usd por mes de los últimos doce meses, con dos series:
+   el proveedor Nippon Parts y todos los demás juntos. Fuente: fact_parts_sales
+   unida con dim_material por material_id. Los materiales sin proveedor cuentan
+   como resto.
+   Título: Venta de repuestos, Nippon Parts contra el resto.
+
+2. Barras. Porcentaje de combinaciones de punto y repuesto en quiebre de stock
+   por mes, desde fact_stock, usando fecha_snapshot y la bandera en_quiebre.
+   Pintá de rojo las barras que superen el 8%.
+   Título: Quiebre de stock mensual.
+
+3. Barras con línea de referencia. Suma de costo_espera_usd por mes desde
+   fact_workorder, por fecha_apertura, más una línea horizontal con el promedio
+   mensual del año, para que se vea cuánto se sale marzo.
+   Título: Impacto en dólares de las bahías detenidas.
+
+4. Mapa de calor. Suma de costo_espera_usd por país y por familia de repuesto,
+   solo para las órdenes abiertas entre el 2 de marzo y el 17 de abril de 2026.
+   Uní fact_workorder con dim_dealer por dealer_id para el país, y con
+   dim_material por material_id_principal para la familia.
+   Título: Dónde se concentró el daño.
+
+5. Barras horizontales más tabla al lado. Cantidad de proyectos por estado desde
+   pmo_projects, y la tabla con presupuesto_usd total y ejecutado_usd total por
+   estado.
+   Título: Semáforo del portafolio.
+
+6. Tabla. Los diez proyectos de mayor sobregiro: nombre, lider, pais,
+   presupuesto_usd, ejecutado_usd, sobregiro en dólares y sobregiro en
+   porcentaje. Solo los que tienen ejecutado_usd mayor que presupuesto_usd,
+   ordenados por sobregiro en dólares descendente.
+   Título: Proyectos por encima del presupuesto.
+
+Además:
+- Un filtro por país y otro por familia de repuesto, aplicados a todas las
+  visualizaciones que tengan esas columnas disponibles.
+- Un filtro de rango de fechas que afecte a las cuatro visualizaciones de
+  operación.
+- Todos los títulos, etiquetas de eje y nombres de columna en español.
+- Los montos en dólares, con separador de miles y sin decimales.
+
+Creá primero los datasets que hagan falta y después las visualizaciones sobre
+ellos. Si dos visualizaciones pueden compartir el mismo dataset, compartilo en
+vez de duplicar la consulta.
+```
+
+**Cuando algo salga distinto de lo que esperabas**, no rehagas el tablero:
+corregí encima. Estos son los ajustes que más se piden.
+
+```
+El gráfico de quiebre de stock está tomando todas las filas de fact_stock.
+Necesito el porcentaje sobre el total de combinaciones de cada mes, no el
+conteo absoluto. Recalculalo como filas en quiebre sobre filas totales del mes.
 ```
 
 ```
-Un gráfico de barras con el porcentaje de combinaciones de punto y repuesto en
-quiebre de stock por mes, desde inchcape_workshop.ops.fact_stock. Pintá de
-rojo las barras que superen el 8%. Título: Quiebre de stock mensual.
+El filtro de país no está afectando al mapa de calor. Conectalo también a esa
+visualización.
 ```
 
 ```
-Un gráfico de barras con la suma de costo_espera_usd por mes desde
-inchcape_workshop.ops.fact_workorder. Agregale una línea con el promedio
-mensual del año para que se vea cuánto se sale marzo. Título: Impacto en
-dólares de las bahías detenidas.
-```
-
-```
-Un mapa de calor con la suma de costo_espera_usd por país y por familia de
-repuesto, solo para las órdenes abiertas entre el 2 de marzo y el 17 de abril
-de 2026. Uní fact_workorder con dim_dealer para el país y con dim_material
-para la familia. Título: Dónde se concentró el daño.
-```
-
-```
-Un gráfico de barras horizontales con la cantidad de proyectos por estado
-desde inchcape_workshop.pmo.pmo_projects, y al lado una tabla con el
-presupuesto total y el ejecutado total por estado. Título: Semáforo del
-portafolio.
-```
-
-```
-Una tabla con los diez proyectos de mayor sobregiro: nombre, líder, país,
-presupuesto aprobado, ejecutado, sobregiro en dólares y sobregiro en
-porcentaje. Solo los que tienen ejecutado mayor al presupuesto. Ordená por
-sobregiro en dólares descendente. Título: Proyectos por encima del presupuesto.
-```
-
-Filtros, al final:
-
-```
-Agregá al dashboard un filtro por país y otro por familia de repuesto que
-apliquen a todos los gráficos que tengan esas columnas disponibles.
+Movéme la tabla de proyectos sobregirados arriba del semáforo, y hacé que
+ocupe todo el ancho.
 ```
 
 ## 4. La app interna
 
+Un solo prompt para la app completa, con las dos pestañas y el cache ya adentro.
+
 ```
 Escribime una app de Streamlit para Databricks Apps que le sirva a la PMO de
-Inchcape para revisar el portafolio antes del comité. Requisitos:
+Inchcape para revisar el portafolio antes del comité. Dame todos los archivos
+que necesita para desplegar: app.py, app.yaml y requirements.txt.
 
-- Lee de la vista inchcape_workshop.pmo.vw_alertas_portafolio usando
-  databricks-sql-connector con las credenciales que Databricks Apps inyecta
-  por variables de entorno. No hardcodees ningún token.
-- Arriba, tres tarjetas grandes: cantidad de proyectos duplicados,
-  cantidad sin fecha comprometida, y dólares de sobregiro total.
+Conexión a datos:
+- Leé con databricks-sql-connector, usando las credenciales que Databricks Apps
+  inyecta por variables de entorno. No hardcodees ningún token, host ni
+  warehouse id.
+- Envolvé cada lectura en una función cacheada con st.cache_data y un tiempo de
+  vida de diez minutos. Todo el filtrado se hace en memoria sobre el DataFrame
+  ya cargado, no volviendo a consultar. Si la app consulta cada vez que muevo un
+  filtro, se vuelve inusable.
+
+Pestaña 1, Alertas del portafolio. Lee de
+inchcape_workshop.pmo.vw_alertas_portafolio:
+- Arriba, tres tarjetas grandes: cantidad de proyectos duplicados, cantidad sin
+  fecha comprometida, y dólares de sobregiro total.
 - Abajo, una tabla filtrable por tipo de alerta y por país.
-- Un botón que exporte la tabla filtrada a CSV.
+- Un botón que exporte a CSV la tabla ya filtrada, no la tabla completa.
+
+Pestaña 2, Seguimiento presupuestal. Lee de inchcape_workshop.pmo.pmo_budget,
+columnas mes, presupuesto_mes_usd y ejecutado_mes_usd:
+- Un gráfico de barras agrupadas con presupuesto contra ejecutado, mes a mes.
+- Debajo, la tabla mensual con desviación en dólares, desviación acumulada del
+  año y una columna semáforo: Verde por debajo del 5%, Amarillo hasta el 15%,
+  Rojo por encima.
+
+Detalles que aplican a las dos pestañas:
 - Todo el texto de la interfaz en español.
-- Incluí el archivo app.yaml y el requirements.txt que necesita.
-```
-
-Para iterar sobre la app una vez que arranca:
-
-```
-Agregale a la app una segunda pestaña con el seguimiento presupuestal mensual
-del portafolio, usando la consulta de presupuesto contra ejecutado que armamos
-antes. Un gráfico de barras agrupadas y abajo la tabla con el semáforo.
-```
-
-```
-La app tarda mucho en cargar porque consulta cada vez que muevo un filtro.
-Agregale cache a la lectura de datos con un tiempo de vida de diez minutos,
-y que el filtrado se haga en memoria.
+- Montos en dólares, con separador de miles y sin decimales.
+- Si una consulta falla, mostrá un mensaje claro en la interfaz en vez de
+  reventar con el stack trace.
 ```
 
 Cuando falla, el prompt más útil de todo el taller:

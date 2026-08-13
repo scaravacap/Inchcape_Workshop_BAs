@@ -180,9 +180,10 @@ Luego pedile que lo convierta en algo reutilizable:
 ```
 Convierte las tres consultas en una sola vista llamada
 inchcape_workshop.pmo.vw_alertas_portafolio, con una columna tipo_alerta que
-diga cuál de los tres problemas es, una columna impacto_usd y una columna
-detalle. Agrégale comentarios a la vista y a cada columna explicando qué es,
-para que cualquiera en la PMO la entienda sin preguntarme.
+diga cuál de los tres problemas es, una columna impacto_usd, una columna detalle
+y las columnas proyecto_id, nombre, lider y pais del proyecto involucrado.
+Agrégale comentarios a la vista y a cada columna explicando qué es, para que
+cualquiera en la PMO la entienda sin preguntarme.
 ```
 
 ## Paso 3. El dashboard de portafolio y posventa
@@ -190,12 +191,13 @@ para que cualquiera en la PMO la entienda sin preguntarme.
 **Objetivo:** un tablero que sirva para la reunión de seguimiento, construido sin
 depender de nadie.
 
-**Qué hacer:** menú **Dashboards**, **Create dashboard**. En la pestaña de datos,
-agrega las tablas que necesites. Después usa el asistente para crear cada gráfico
-describiéndolo en español.
+**Qué hacer:** menú **Dashboards**, **Create dashboard**. Abrí el asistente y
+pegale un solo prompt con el tablero entero. No hace falta pedirle un gráfico a
+la vez: describí las seis visualizaciones, los filtros y el idioma de una, y
+dejá que arme los datasets.
 
-Los seis gráficos que le pido, uno por uno, están en
-[PROMPTS.md, sección 3](PROMPTS.md#3-el-dashboard). El resumen:
+El prompt completo está en
+[PROMPTS.md, sección 3](PROMPTS.md#3-el-dashboard). Lo que pide:
 
 1. Venta de repuestos por mes, con Nippon Parts separado del resto.
 2. Porcentaje de quiebre de stock por mes.
@@ -204,11 +206,16 @@ Los seis gráficos que le pido, uno por uno, están en
 5. Semáforo del portafolio: proyectos por estado, con presupuesto y ejecutado.
 6. Top diez de proyectos por sobregiro.
 
+Más los filtros de país, familia de repuesto y rango de fechas.
+
 **Cómo sabés que funcionó:** el pico de marzo se ve a simple vista en tres de los
 gráficos, y podés contar la historia completa moviendo un solo filtro de fecha.
 
-**Si te sobra tiempo**, agrega un filtro por país y otro por familia de repuesto,
-y fíjate cómo cambia la conclusión cuando aislás Colombia.
+**Si algo sale distinto** de lo que pediste, corregí encima en vez de rehacer el
+tablero. Al final de la sección 3 están los tres ajustes que más se piden.
+
+**Si te sobra tiempo**, fijate cómo cambia la conclusión cuando aislás Colombia
+con el filtro de país.
 
 ## Paso 4. La app interna
 
@@ -236,25 +243,13 @@ GRANT USE SCHEMA, SELECT ON SCHEMA inchcape_workshop.pmo TO `<service principal 
    Si te salta la app sin permisos y no entendés por qué, es casi siempre esto.
 
 2. Abrí el código de la app y reemplazalo con lo que te genere Genie Code a partir
-   del prompt de [PROMPTS.md, sección 4](PROMPTS.md#4-la-app-interna).
+   del prompt de [PROMPTS.md, sección 4](PROMPTS.md#4-la-app-interna). Es un solo
+   prompt y pide la app entera: los tres archivos que necesita para desplegar
+   (`app.py`, `app.yaml`, `requirements.txt`), la pestaña de alertas del
+   portafolio con las tres tarjetas y la tabla exportable a CSV, la pestaña de
+   seguimiento presupuestal con el semáforo, y el cache para que no consulte cada
+   vez que movés un filtro.
 3. Dale **Deploy** y esperá. El primer despliegue tarda unos minutos.
-
-El prompt arranca así:
-
-```
-Escribime una app de Streamlit para Databricks Apps que le sirva a la PMO de
-Inchcape para revisar el portafolio antes del comité. Requisitos:
-
-- Lee de la vista inchcape_workshop.pmo.vw_alertas_portafolio usando
-  databricks-sql-connector con las credenciales que Databricks Apps inyecta
-  por variables de entorno. No hardcodees ningún token.
-- Arriba, tres tarjetas grandes: cantidad de proyectos duplicados,
-  cantidad sin fecha comprometida, y dólares de sobregiro total.
-- Abajo, una tabla filtrable por tipo de alerta y por país.
-- Un botón que exporte la tabla filtrada a CSV.
-- Todo el texto de la interfaz en español.
-- Incluí el archivo app.yaml y el requirements.txt que necesita.
-```
 
 **Cómo sabés que funcionó:** abrís la URL de la app y ves las tres tarjetas con
 los números del Paso 2. Ese es el momento en que la PMO deja de pedir reportes y
