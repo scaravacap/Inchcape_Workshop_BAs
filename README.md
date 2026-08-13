@@ -152,13 +152,16 @@ reporte oficial. Duplicados, presupuesto pasado y fechas deslizadas.
 o con la paleta de comandos.
 
 Los prompts completos de este paso están en
-[PROMPTS.md, sección 2](PROMPTS.md#2-el-cruce-de-calidad-de-la-pmo). El primero es
-este:
+[PROMPTS.md, sección 2](PROMPTS.md#2-el-cruce-de-calidad-de-la-pmo), en dos
+versiones. El **camino corto** es un solo prompt que arma el notebook entero. El
+**camino paso a paso** pide una consulta por vez. Empezá por el corto; si algo
+sale raro, el paso a paso te deja ver cuál consulta se rompió. Este es el primero
+del paso a paso:
 
 ```
 Trabajo en la PMO de Inchcape. Antes de cada reporte oficial reviso a mano el
-portafolio en Excel y siempre encuentro los mismos tres problemas. Quiero que me
-armes esa revisión en SQL sobre la tabla inchcape_workshop.pmo.pmo_projects:
+portafolio en Excel y siempre encuentro los mismos tres problemas. Crea un
+notebook con esa revisión en SQL sobre la tabla inchcape_workshop.pmo.pmo_projects:
 
 1. Proyectos cargados dos veces: mismo nombre con proyecto_id distinto.
    Muéstrame los pares y cuánto presupuesto se está contando doble.
@@ -169,6 +172,10 @@ armes esa revisión en SQL sobre la tabla inchcape_workshop.pmo.pmo_projects:
 Devuélveme una consulta por cada problema, con nombres de columna en español y
 ordenadas de mayor a menor impacto en dinero.
 ```
+
+Fijate que le pide un notebook de forma explícita. `Quiero que me armes esa
+revisión` te devuelve texto en el chat; `Crea un notebook` te devuelve el
+notebook, que es lo que querés.
 
 **Cómo sabés que funcionó:** encontrás **3 nombres de proyecto duplicados**,
 **2 proyectos sin fecha comprometida** y **11 de los 25 por encima del
@@ -191,13 +198,17 @@ cualquiera en la PMO la entienda sin preguntarme.
 **Objetivo:** un tablero que sirva para la reunión de seguimiento, construido sin
 depender de nadie.
 
-**Qué hacer:** menú **Dashboards**, **Create dashboard**. Abrí el asistente y
-pegale un solo prompt con el tablero entero. No hace falta pedirle un gráfico a
-la vez: describí las seis visualizaciones, los filtros y el idioma de una, y
-dejá que arme los datasets.
+**Qué hacer:** menú **Dashboards**, **Create dashboard**. En la pestaña de datos,
+agrega las tablas que necesites. Después usa el asistente describiéndole en
+español lo que querés ver.
 
-El prompt completo está en
-[PROMPTS.md, sección 3](PROMPTS.md#3-el-dashboard). Lo que pide:
+[PROMPTS.md, sección 3](PROMPTS.md#3-el-dashboard) trae los dos caminos: el
+**corto**, un prompt que pide el tablero completo, y el **paso a paso**, seis
+prompts, uno por gráfico. El corto es el más rápido cuando funciona, y también el
+que más se rompe: seis visualizaciones en una sola pasada es mucho pedirle al
+asistente, y si te devuelve `Unable to render visualization` no vas a saber cuál
+de las seis lo causó. Ahí pedís esa sola con su prompt del paso a paso. Los seis
+gráficos son:
 
 1. Venta de repuestos por mes, con Nippon Parts separado del resto.
 2. Porcentaje de quiebre de stock por mes.
@@ -212,10 +223,10 @@ Más los filtros de país, familia de repuesto y rango de fechas.
 gráficos, y podés contar la historia completa moviendo un solo filtro de fecha.
 
 **Si algo sale distinto** de lo que pediste, corregí encima en vez de rehacer el
-tablero. Al final de la sección 3 están los tres ajustes que más se piden.
+tablero. Al final de la sección 3 están los ajustes que más se piden.
 
-**Si te sobra tiempo**, fijate cómo cambia la conclusión cuando aislás Colombia
-con el filtro de país.
+**Si te sobra tiempo**, agrega un filtro por país y otro por familia de repuesto,
+y fíjate cómo cambia la conclusión cuando aislás Colombia.
 
 ## Paso 4. La app interna
 
@@ -243,13 +254,29 @@ GRANT USE SCHEMA, SELECT ON SCHEMA inchcape_workshop.pmo TO `<service principal 
    Si te salta la app sin permisos y no entendés por qué, es casi siempre esto.
 
 2. Abrí el código de la app y reemplazalo con lo que te genere Genie Code a partir
-   del prompt de [PROMPTS.md, sección 4](PROMPTS.md#4-la-app-interna). Es un solo
-   prompt y pide la app entera: los tres archivos que necesita para desplegar
-   (`app.py`, `app.yaml`, `requirements.txt`), la pestaña de alertas del
-   portafolio con las tres tarjetas y la tabla exportable a CSV, la pestaña de
-   seguimiento presupuestal con el semáforo, y el cache para que no consulte cada
-   vez que movés un filtro.
+   de [PROMPTS.md, sección 4](PROMPTS.md#4-la-app-interna). También acá hay dos
+   caminos: el **corto**, un prompt que pide la app entera con las dos pestañas y
+   el cache, o el **paso a paso**, que arranca con la versión mínima y le agrega
+   lo demás encima. Con una app, desplegar la versión mínima y verla abrir antes
+   de pedirle más te ahorra depurar dos problemas a la vez.
 3. Dale **Deploy** y esperá. El primer despliegue tarda unos minutos.
+
+El prompt de la app mínima arranca así:
+
+```
+Escribime una app de Streamlit para Databricks Apps que le sirva a la PMO de
+Inchcape para revisar el portafolio antes del comité. Requisitos:
+
+- Lee de la vista inchcape_workshop.pmo.vw_alertas_portafolio usando
+  databricks-sql-connector con las credenciales que Databricks Apps inyecta
+  por variables de entorno. No hardcodees ningún token.
+- Arriba, tres tarjetas grandes: cantidad de proyectos duplicados,
+  cantidad sin fecha comprometida, y dólares de sobregiro total.
+- Abajo, una tabla filtrable por tipo de alerta y por país.
+- Un botón que exporte la tabla filtrada a CSV.
+- Todo el texto de la interfaz en español.
+- Incluí el archivo app.yaml y el requirements.txt que necesita.
+```
 
 **Cómo sabés que funcionó:** abrís la URL de la app y ves las tres tarjetas con
 los números del Paso 2. Ese es el momento en que la PMO deja de pedir reportes y

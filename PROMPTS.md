@@ -15,6 +15,27 @@ falta algo, pedí el ajuste encima de lo que ya hay: `Ahora agregale una columna
 el porcentaje del total`. Empezar de cero cada vez es la forma más lenta de
 trabajar con Genie Code.
 
+## Dos caminos para el mismo resultado
+
+Las secciones 2, 3 y 4 construyen algo: un notebook, un dashboard, una app. Cada
+una viene en dos versiones del mismo pedido.
+
+**El camino corto** es un solo prompt que lo pide todo de una. Cuando sale bien,
+llegás al resultado en un paso, y es la forma en que vas a trabajar el día que ya
+le tengas la mano tomada a la herramienta.
+
+**El camino paso a paso** parte el mismo pedido en prompts chicos. Es más lento,
+pero cada pieza se ve nacer por separado.
+
+Elegí el corto y, si algo sale mal, caé al paso a paso. Un error genérico sobre un
+prompt de seis visualizaciones no te dice cuál de las seis lo causó; el mismo error
+sobre un prompt de una visualización sí. Aislar es más rápido que adivinar. Los dos
+caminos llegan al mismo lado, así que podés cambiar de uno al otro a mitad de
+camino: pedí con el corto lo que ya funcionó y con el paso a paso lo que no.
+
+Las secciones 1 y 5 no tienen esa división: son preguntas a Genie, no
+construcción. Cada pregunta se responde sola y se encadena con la anterior.
+
 ## 1. Preguntarle a los datos en español
 
 Para el espacio de Genie del Paso 1. Van en orden, cada una construye sobre la anterior.
@@ -71,12 +92,58 @@ de dim_dealer y agrupá por ahí.
 
 ## 2. El cruce de calidad de la PMO
 
-El prompt principal del Paso 2:
+### Camino corto: un prompt, el notebook entero
 
 ```
 Trabajo en la PMO de Inchcape. Antes de cada reporte oficial reviso a mano el
-portafolio en Excel y siempre encuentro los mismos tres problemas. Quiero que me
-armes esa revisión en SQL sobre la tabla inchcape_workshop.pmo.pmo_projects:
+portafolio en Excel y siempre encuentro los mismos problemas. Crea un notebook
+en SQL sobre el esquema inchcape_workshop.pmo que me deje toda esa revisión
+automatizada, con una celda de markdown antes de cada consulta explicando qué
+resuelve.
+
+Sobre pmo_projects, una consulta por cada problema:
+1. Proyectos cargados dos veces: mismo nombre con proyecto_id distinto.
+   Muéstrame los pares y cuánto presupuesto se está contando doble.
+2. Proyectos sin fecha de cierre comprometida, o sea con fecha_fin_plan en NULL.
+3. Proyectos donde el ejecutado ya superó el presupuesto aprobado.
+   Muéstrame el sobregiro en dólares y en porcentaje.
+
+Sobre pmo_milestones, el deslizamiento de cada hito en días, como la diferencia
+entre fecha_real y fecha_plan. Dame por proyecto el deslizamiento promedio, el
+peor hito y cuántos hitos están en estado Vencido. Uní con pmo_projects para
+traer el nombre del proyecto y su líder.
+
+Sobre pmo_budget, el seguimiento presupuestal mensual del portafolio:
+presupuesto del mes, ejecutado del mes, desviación en dólares y desviación
+acumulada del año, con una columna semáforo que diga Verde si la desviación
+acumulada está por debajo del 5%, Amarillo hasta el 15% y Rojo por encima.
+
+Una vista llamada inchcape_workshop.pmo.vw_alertas_portafolio que consolide los
+tres problemas de pmo_projects, con una columna tipo_alerta que diga cuál de los
+tres es, una columna impacto_usd, una columna detalle y las columnas
+proyecto_id, nombre, lider y pais del proyecto involucrado. Agrégale comentarios
+a la vista y a cada columna, para que cualquiera en la PMO la entienda sin
+preguntarme.
+
+Y de último, el cruce con la operación, que es la pregunta que nadie puede
+responder hoy: por país, el costo de espera acumulado en ops.fact_workorder
+durante el incidente del 2 de marzo al 17 de abril de 2026, cuántos proyectos
+del programa Plan Posventa 360 hay en ese país, cuánto presupuesto tienen
+asignado y el avance promedio reportado. Quiero ver si estamos invirtiendo
+donde más duele.
+
+Todo con nombres de columna en español y ordenado de mayor a menor impacto
+en dinero.
+```
+
+### Camino paso a paso
+
+El primero, que además crea el notebook donde va a vivir el resto:
+
+```
+Trabajo en la PMO de Inchcape. Antes de cada reporte oficial reviso a mano el
+portafolio en Excel y siempre encuentro los mismos tres problemas. Crea un
+notebook con esa revisión en SQL sobre la tabla inchcape_workshop.pmo.pmo_projects:
 
 1. Proyectos cargados dos veces: mismo nombre con proyecto_id distinto.
    Muéstrame los pares y cuánto presupuesto se está contando doble.
@@ -87,6 +154,9 @@ armes esa revisión en SQL sobre la tabla inchcape_workshop.pmo.pmo_projects:
 Devuélveme una consulta por cada problema, con nombres de columna en español y
 ordenadas de mayor a menor impacto en dinero.
 ```
+
+Pedile el notebook de forma explícita. `Quiero que me armes esa revisión` te
+devuelve texto en el chat; `Crea un notebook` te devuelve el notebook.
 
 El deslizamiento de fechas, que es la otra mitad del trabajo de la PMO:
 
@@ -133,7 +203,12 @@ avance promedio reportado. Quiero ver si estamos invirtiendo donde más duele.
 
 ## 3. El dashboard
 
-Un solo prompt para el tablero completo. Pegalo en el asistente del dashboard.
+### Camino corto: un prompt, el tablero entero
+
+Pegalo en el asistente del dashboard. Es el camino que más falla de los tres,
+porque le pide al asistente seis visualizaciones y tres filtros en una sola
+pasada. Si te devuelve `Unable to render visualization` en alguna, o un error
+sin explicación, no lo pelees: pasate al paso a paso para la pieza que falló.
 
 ```
 Armame un dashboard completo para el comité de seguimiento de posventa de
@@ -190,6 +265,63 @@ ellos. Si dos visualizaciones pueden compartir el mismo dataset, compartilo en
 vez de duplicar la consulta.
 ```
 
+### Camino paso a paso: un prompt por gráfico
+
+Uno por gráfico, en este orden. Cada uno se pega en el asistente del dashboard
+y se revisa antes de pasar al siguiente.
+
+```
+Un gráfico de líneas con la venta mensual de repuestos en dólares de los
+últimos doce meses. Dos líneas: una con el proveedor Nippon Parts y otra con
+todos los demás proveedores juntos. Título: Venta de repuestos, Nippon Parts
+contra el resto.
+```
+
+```
+Un gráfico de barras con el porcentaje de combinaciones de punto y repuesto en
+quiebre de stock por mes, desde inchcape_workshop.ops.fact_stock. El porcentaje
+es filas en quiebre sobre filas totales del mes, no el conteo. Pintá de rojo las
+barras que superen el 8%. Título: Quiebre de stock mensual.
+```
+
+```
+Un gráfico de barras con la suma de costo_espera_usd por mes desde
+inchcape_workshop.ops.fact_workorder. Agregale una línea con el promedio
+mensual del año para que se vea cuánto se sale marzo. Título: Impacto en
+dólares de las bahías detenidas.
+```
+
+```
+Un mapa de calor con la suma de costo_espera_usd por país y por familia de
+repuesto, solo para las órdenes abiertas entre el 2 de marzo y el 17 de abril
+de 2026. Uní fact_workorder con dim_dealer para el país y con dim_material
+para la familia. Título: Dónde se concentró el daño.
+```
+
+```
+Un gráfico de barras horizontales con la cantidad de proyectos por estado
+desde inchcape_workshop.pmo.pmo_projects, y al lado una tabla con el
+presupuesto total y el ejecutado total por estado. Título: Semáforo del
+portafolio.
+```
+
+```
+Una tabla con los diez proyectos de mayor sobregiro: nombre, líder, país,
+presupuesto aprobado, ejecutado, sobregiro en dólares y sobregiro en
+porcentaje. Solo los que tienen ejecutado mayor al presupuesto. Ordená por
+sobregiro en dólares descendente. Título: Proyectos por encima del presupuesto.
+```
+
+Los filtros, al final, cuando los seis gráficos ya están:
+
+```
+Agregá al dashboard un filtro por país y otro por familia de repuesto que
+apliquen a todos los gráficos que tengan esas columnas disponibles, y un filtro
+de rango de fechas que afecte a los cuatro gráficos de operación.
+```
+
+### Ajustes, para cualquiera de los dos caminos
+
 **Cuando algo salga distinto de lo que esperabas**, no rehagas el tablero:
 corregí encima. Estos son los ajustes que más se piden.
 
@@ -209,9 +341,22 @@ Movéme la tabla de proyectos sobregirados arriba del semáforo, y hacé que
 ocupe todo el ancho.
 ```
 
+Cuando una visualización queda con el cartel `Unable to render visualization`,
+borrala y pedila sola, con el prompt del paso a paso que le corresponde. Antes
+de eso, este suele alcanzar:
+
+```
+La visualización de venta de repuestos quedó con el error Unable to render
+visualization. Borrala y armala de nuevo desde cero, con el dataset más simple
+que sirva: una consulta que devuelva mes, serie y monto, y un gráfico de líneas
+sobre esas tres columnas.
+```
+
 ## 4. La app interna
 
-Un solo prompt para la app completa, con las dos pestañas y el cache ya adentro.
+### Camino corto: un prompt, la app completa
+
+Las dos pestañas y el cache, todo en el mismo pedido.
 
 ```
 Escribime una app de Streamlit para Databricks Apps que le sirva a la PMO de
@@ -248,7 +393,46 @@ Detalles que aplican a las dos pestañas:
   reventar con el stack trace.
 ```
 
-Cuando falla, el prompt más útil de todo el taller:
+### Camino paso a paso
+
+Primero la app mínima que despliega y se ve:
+
+```
+Escribime una app de Streamlit para Databricks Apps que le sirva a la PMO de
+Inchcape para revisar el portafolio antes del comité. Requisitos:
+
+- Lee de la vista inchcape_workshop.pmo.vw_alertas_portafolio usando
+  databricks-sql-connector con las credenciales que Databricks Apps inyecta
+  por variables de entorno. No hardcodees ningún token.
+- Arriba, tres tarjetas grandes: cantidad de proyectos duplicados,
+  cantidad sin fecha comprometida, y dólares de sobregiro total.
+- Abajo, una tabla filtrable por tipo de alerta y por país.
+- Un botón que exporte la tabla filtrada a CSV.
+- Todo el texto de la interfaz en español.
+- Incluí el archivo app.yaml y el requirements.txt que necesita.
+```
+
+Desplegala y comprobá que abre antes de pedirle nada más. Recién ahí, la
+segunda pestaña:
+
+```
+Agregale a la app una segunda pestaña con el seguimiento presupuestal mensual
+del portafolio, leyendo inchcape_workshop.pmo.pmo_budget: un gráfico de barras
+agrupadas con presupuesto contra ejecutado mes a mes, y abajo la tabla con la
+desviación y el semáforo.
+```
+
+Y por último el cache, que es el ajuste que se nota apenas la usás:
+
+```
+La app tarda mucho en cargar porque consulta cada vez que muevo un filtro.
+Agregale cache a la lectura de datos con un tiempo de vida de diez minutos,
+y que el filtrado se haga en memoria.
+```
+
+### Cuando falla
+
+El prompt más útil de todo el taller, tomes el camino que tomes:
 
 ```
 La app falló al desplegar. Este es el log completo:
