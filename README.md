@@ -71,6 +71,21 @@ la sala, y por lo tanto los mismos resultados.
 **Ahora lee [HISTORIA.md](HISTORIA.md).** Son tres minutos y es lo que le da
 sentido a todo lo que sigue. Sin eso, los ejercicios son consultas sueltas.
 
+## Paso 0.5. Dispará la app ahora, aunque la vayas a usar al final
+
+Crear una app tarda unos tres minutos en aprovisionar. En vez de esperar sentado
+en el Paso 4, la creamos ahora y se va cocinando sola mientras trabajás.
+
+1. Menú **Compute**, pestaña **Apps**, botón **Create app**.
+2. Nombre: `alertas-portafolio-pmo`.
+3. Plantilla: **Streamlit**.
+4. En la sección de **Resources** o recursos de la app, agregá el
+   **SQL warehouse** llamado `Serverless Starter Warehouse` con permiso de uso.
+   Este paso es el que la gente olvida, y sin él la app no puede leer datos.
+5. Dale crear y **dejala ahí**. Volvemos en el Paso 4.
+
+Mientras se crea, seguí con el Paso 1.
+
 ## Paso 1. Preguntarle a los datos en español
 
 **Objetivo:** responder preguntas de negocio sin escribir SQL, y descubrir el
@@ -200,19 +215,29 @@ y fíjate cómo cambia la conclusión cuando aislás Colombia.
 **Objetivo:** pasar de entregar un reporte a entregar una herramienta. Esto es lo
 que cambia el rol de la PMO.
 
-Este paso es el más ambicioso del recorrido y toma unos veinticinco minutos.
-Free Edition permite hasta tres apps por cuenta, y la app se apaga sola a las
-veinticuatro horas de inactividad. Se prende de nuevo con un botón.
+Este es el paso más ambicioso del recorrido. La app que creaste en el Paso 0.5 ya
+debería estar lista.
+
+Free Edition permite hasta tres apps por cuenta, y las apaga solas a las
+veinticuatro horas. Se prenden de nuevo con un botón.
 
 **Qué hacer:**
 
-1. Menú **Compute**, pestaña **Apps**, botón **Create app**.
-2. Elige la plantilla de **Streamlit**.
-3. Ponle nombre `alertas-portafolio-pmo`.
-4. Cuando la app quede creada, abre su código y reemplázalo con lo que te genere
-   Genie Code a partir del prompt de
-   [PROMPTS.md, sección 4](PROMPTS.md#4-la-app-interna).
-5. Dale **Deploy** y espera. La primera vez tarda unos minutos.
+1. **Dale permiso a la app sobre los datos.** La app corre con su propia identidad,
+   un service principal, que nace sin acceso a nada. En la pantalla de tu app,
+   copiá el nombre del service principal. Después, en un notebook, corré esto
+   reemplazando el nombre:
+
+```sql
+GRANT USE CATALOG ON CATALOG inchcape_workshop TO `<service principal de tu app>`;
+GRANT USE SCHEMA, SELECT ON SCHEMA inchcape_workshop.pmo TO `<service principal de tu app>`;
+```
+
+   Si te salta la app sin permisos y no entendés por qué, es casi siempre esto.
+
+2. Abrí el código de la app y reemplazalo con lo que te genere Genie Code a partir
+   del prompt de [PROMPTS.md, sección 4](PROMPTS.md#4-la-app-interna).
+3. Dale **Deploy** y esperá. El primer despliegue tarda unos minutos.
 
 El prompt arranca así:
 
